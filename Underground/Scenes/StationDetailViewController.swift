@@ -5,6 +5,7 @@
 //  Created by YUJIN KWON on 2022/11/05.
 //
 
+import Alamofire
 import SnapKit
 import UIKit
 
@@ -16,11 +17,6 @@ final class StationDetailViewController: UIViewController {
         
         return refreshControl
     }()
-    
-    @objc func fetchData() {
-        print("refresh")
-        refreshControl.endRefreshing()
-    }
     
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -45,8 +41,31 @@ final class StationDetailViewController: UIViewController {
         
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints { $0.edges.equalToSuperview() }
+        
+        fetchData()
     }
+    
+    @objc private func fetchData() {
+       
+        
+        let stationName = "한강진역"
+        
+        let urlString = "http://swopenapi.seoul.go.kr/api/subway/sample/json/realtimeStationArrival/0/5/\(stationName.replacingOccurrences(of: "역", with: ""))"
+        
+        AF
+            .request(urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")
+            .responseDecodable(of: StationArriavalResponseModel.self) { [weak self] response in
+                self?.refreshControl.endRefreshing()
+                guard case .success(let data) = response.result else { return }
+                
+                print(data.realtimeArrivalList)
+            }
+            .resume()
+    }
+    
 }
+
+
 
 extension StationDetailViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
