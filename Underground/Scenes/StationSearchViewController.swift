@@ -31,6 +31,7 @@ class StationSearchViewController: UIViewController {
 
     private func setNavigationItem() {
         navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.tintColor = .black
         navigationItem.title = "지하철 도착 정보"
         
         let searchController = UISearchController()
